@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
 export default function LandingPage() {
-    // 路由逻辑去掉，改为内部弹窗控制
     const [showLogin, setShowLogin]   = useState(false);
     const [showSignup, setShowSignup] = useState(false);
 
