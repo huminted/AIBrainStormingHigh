@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import logo from './assets/logo.png';
+
 
 export default function LandingPage() {
     const navigate = useNavigate();
@@ -133,7 +133,7 @@ export default function LandingPage() {
         <Container>
             <Nav>
                 <Logo>
-                    <img src={logo} alt="Logo" />
+                    <img src="/assets/logo.png" alt="Logo" />
                     <span>Aldealogue</span>
                 </Logo>
                 <NavButtons>

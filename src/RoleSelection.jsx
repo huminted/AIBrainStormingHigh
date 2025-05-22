@@ -3,10 +3,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useNavigate, useLocation } from 'react-router-dom'
-import avatar1 from './assets/avatars/avatar1.png';
-import avatar2 from './assets/avatars/avatar2.png';
-import avatar3 from './assets/avatars/avatar3.png';
-import avatar4 from './assets/avatars/avatar4.png';
+
 
 export default function RoleSelection() {
     const navigate = useNavigate()
@@ -19,10 +16,10 @@ export default function RoleSelection() {
             id: 1,
             title: 'Default',
             avatars: [
-                avatar1,
-                avatar2,
-                avatar3,
-                avatar4,
+                "/assets/avatars/avatar1.png",
+                "/assets/avatars/avatar2.png",
+                "/assets/avatars/avatar3.png",
+                "/assets/avatars/avatar4.png",
             ],
             roles: ['Product Manager', 'Operation Specialist','Software Architect', 'UI/UX Designer'],
             teamLabel: 'Development Team',
