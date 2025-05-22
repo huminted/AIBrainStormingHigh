@@ -3,6 +3,10 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useNavigate, useLocation } from 'react-router-dom'
+import avatar1 from './assets/avatars/avatar1.png';
+import avatar2 from './assets/avatars/avatar2.png';
+import avatar3 from './assets/avatars/avatar3.png';
+import avatar4 from './assets/avatars/avatar4.png';
 
 export default function RoleSelection() {
     const navigate = useNavigate()
@@ -15,50 +19,24 @@ export default function RoleSelection() {
             id: 1,
             title: 'Default',
             avatars: [
-                'https://i.pravatar.cc/32?img=1',
-                'https://i.pravatar.cc/32?img=2',
-                'https://i.pravatar.cc/32?img=3',
+                avatar1,
+                avatar2,
+                avatar3,
+                avatar4,
             ],
-            extraCount: 2,
-            roles: ['Product Manager', 'Operation Specialist', 'UX Designer'],
+            roles: ['Product Manager', 'Operation Specialist','Software Architect', 'UI/UX Designer'],
             teamLabel: 'Development Team',
+            description:['Focused on solving real user problems and shaping product strategy.',
+                'Handles data and builds smart systems to power product features with machine learning',
+                'Designs modular systems that scale well and remain robust under pressure.',
+                'Crafts intuitive interfaces and seamless user journeys.'],
+            focus:['User needs, feature prioritization, MVP validation',
+                'Collect and clean data, build ML models, deploy data pipelines',
+                'System architecture, scalability, stability',
+                'Interface design, user experience, interaction flow'],
+            name:['Peter','Lois','Stewie','Brian']
         },
-        {
-            id: 2,
-            title: 'Default',
-            avatars: [
-                'https://i.pravatar.cc/32?img=4',
-                'https://i.pravatar.cc/32?img=5',
-                'https://i.pravatar.cc/32?img=6',
-            ],
-            extraCount: 3,
-            roles: ['Designer', 'QA Engineer', 'DevOps'],
-            teamLabel: 'Design Team',
-        },
-        {
-            id: 3,
-            title: 'Default',
-            avatars: ['https://i.pravatar.cc/32?img=7', 'https://i.pravatar.cc/32?img=8'],
-            extraCount: 1,
-            roles: ['Data Scientist', 'ML Engineer'],
-            teamLabel: 'Analytics',
-        },
-        {
-            id: 4,
-            title: 'Default',
-            avatars: ['https://i.pravatar.cc/32?img=9'],
-            extraCount: 4,
-            roles: ['Marketing Lead'],
-            teamLabel: 'Marketing',
-        },
-        {
-            id: 5,
-            title: 'Default',
-            avatars: ['https://i.pravatar.cc/32?img=10', 'https://i.pravatar.cc/32?img=11'],
-            extraCount: 2,
-            roles: ['Support Engineer', 'Customer Success'],
-            teamLabel: 'Support',
-        },
+
     ]
 
     const [roles, setRoles] = useState(initialRoles)

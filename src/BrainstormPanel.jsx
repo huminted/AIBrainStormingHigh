@@ -97,7 +97,7 @@ export default function BrainstormPanel() {
                 <Spacer />
             </Header>
 
-            <MainTitle>Let's Check Your Team Members</MainTitle>
+            <MainTitle>Let's Check Your Team Members</MainTitle>WhatsApp Image 2025-05-21 at 10.15.58.jpeg
 
             <Grid>
                 {projects.map(p => (

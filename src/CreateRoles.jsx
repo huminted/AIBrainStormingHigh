@@ -155,7 +155,8 @@ const Card = styled.div`
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   padding: 16px;
-  display: flex; flex-direction: column;
+  display: flex; 
+  flex-direction: column;
 `
 
 const AddCard = styled(Card)`

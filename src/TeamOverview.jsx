@@ -1,20 +1,29 @@
 // src/TeamOverview.jsx
-
-import React from 'react'
-import { useNavigate, useLocation, Navigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
+import React, { useMemo } from 'react'
+
 
 export default function TeamOverview() {
     const navigate = useNavigate()
     const location = useLocation()
 
-    // 拿到 RoleSelection 传过来的数组，兜底空数组
+    // 拿到 RoleSelection 传过来的数组
     const members = location.state?.selectedRoles || []
+    console.log(members)
+    const roleCards = useMemo(() => {
+        return members.flatMap(member => {
+            const { avatars, roles,description,focus,name } = member;
 
-    // 如果一个都没选，就跳回去
-    if (members.length === 0) {
-        return <Navigate to="/roleselect" replace />
-    }
+            return roles.map((role, idx) => ({
+                avatar: avatars[idx],
+                role,
+                description: description[idx],
+                focus:focus[idx],
+                name:name[idx]
+            }));
+        });
+    }, [members]);
 
     return (
         <Page>
@@ -25,41 +34,31 @@ export default function TeamOverview() {
             </Header>
 
             <MainTitle>Let's Check Your Team Members</MainTitle>
-            <SubTitle>Default</SubTitle>
 
             <GridContainer>
-                {members.map((member) => (
-                    <Card key={member.id}>
-                        <CardHeader>
-                            <AvatarGroup>
-                                {member.avatars.map((url, i) => (
-                                    <Avatar key={i} src={url} style={{ left: i * 24 }} />
-                                ))}
-                                {member.extraCount > 0 && <Extra>+{member.extraCount}</Extra>}
-                            </AvatarGroup>
-                            <TrashIcon onClick={() => console.log('删除', member.id)}>🗑️</TrashIcon>
-                        </CardHeader>
+                {roleCards.map((card, i) => (
+                    <Card key={i}>
+                        <TopRow>
+                            <Avatar src={card.avatar} />
+                            <PersonName>{card.name}</PersonName>
 
-                        <RoleName>{member.title}</RoleName>
-
-                        <DetailBox>
-                            <DetailSection>
-                                <DetailLabel>Focus Areas:</DetailLabel>
+                        </TopRow>
+                        <RoleName>{card.role}</RoleName>
+                        <Body>
+                                <FocusArea>
+                                <strong>Focus Areas:</strong>
                                 <ul>
-                                    {member.roles.map((r, idx) => (
-                                        <li key={idx}>{r}</li>
-                                    ))}
+                                    <li>{card.focus}</li>
                                 </ul>
-                            </DetailSection>
-                            <DetailSection>
-                                <DetailLabel>Description:</DetailLabel>
-                                <p>{member.teamLabel}</p>
-                            </DetailSection>
-                        </DetailBox>
+                            </FocusArea>
+                            <Desc>
+                                <strong>Description:</strong>
+                                <p>{card.description}</p>
+                            </Desc>
+                        </Body>
                     </Card>
                 ))}
             </GridContainer>
-
             <NextBtn onClick={() => alert("Let's Start!")}>Let's Start</NextBtn>
         </Page>
     )
@@ -102,18 +101,12 @@ const MainTitle = styled.h2`
   color: #fff; font-size: 24px;
 `
 
-const SubTitle = styled.div`
-  margin-bottom: 16px;
-  color: #fff; font-size: 18px; text-align: center;
-`
-
 const GridContainer = styled.div`
-  flex: 1;
   display: grid;
-  grid-template-columns: repeat( auto-fit, minmax(280px, 1fr) );
-  gap: 24px;
-  overflow-y: auto;
-  padding-bottom: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;               /* 行列间距 */
+  justify-items: center;   /* 单元格内元素水平居中 */
+  padding: 0 220px;         /* 容器左右留白 */
 `
 
 const Card = styled.div`
@@ -123,15 +116,8 @@ const Card = styled.div`
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   padding: 16px;
-  display: flex; flex-direction: column;
-`
-
-const CardHeader = styled.div`
-  display: flex; justify-content: space-between; align-items: center;
-`
-
-const AvatarGroup = styled.div`
-  position: relative; height: 40px;
+  display: flex; 
+  flex-direction: column;
 `
 
 const Avatar = styled.img`
@@ -141,41 +127,12 @@ const Avatar = styled.img`
   object-fit: cover;
 `
 
-const Extra = styled.div`
-  position: absolute; top: 0; left: ${props => props.left || 72}px;
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: bold;
-`
-
-const TrashIcon = styled.div`
-  cursor: pointer; font-size: 18px; color: #ccc;
-  &:hover { color: #fff; }
-`
 
 const RoleName = styled.div`
   margin: 12px 0 8px;
   font-size: 18px; font-weight: bold; color: #fff;
 `
 
-const DetailBox = styled.div`
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
-  border-radius: 8px; padding: 12px;
-  color: #fff;
-  flex: 1;
-`
-
-const DetailSection = styled.div`
-  margin-bottom: 8px;
-  & ul { margin: 4px 0 0 16px; }
-`
-
-const DetailLabel = styled.div`
-  font-size: 14px; font-weight: bold;
-`
 
 const NextBtn = styled.button`
   margin: 16px auto 0;
@@ -186,4 +143,38 @@ const NextBtn = styled.button`
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   transition: background 0.2s;
   &:hover { background: #f0f0f0; }
+`
+const Desc = styled.div`
+  color: #ddd;
+  margin-top: 8px;
+`
+
+const FocusArea = styled.div`
+  color: #ddd;
+  margin-bottom: 12px;
+  ul {
+    margin: 4px 0 0 16px;
+    padding: 0;
+    list-style: disc;
+  }
+`
+
+const TopRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`
+
+
+
+const Body = styled.div`
+  flex: 1;
+`
+
+const PersonName = styled.div`
+  margin-left: 52px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  line-height: 15px;
 `
