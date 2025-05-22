@@ -2,18 +2,17 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 export default function LandingPage() {
-    const [showLogin, setShowLogin]   = useState(false);
-    const [showSignup, setShowSignup] = useState(false);
+    const navigate = useNavigate();
 
-    // 原有表单
-    const [subject, setSubject]         = useState('');
-    const [topic, setTopic]             = useState('');
-    const [errors, setErrors]           = useState({ subject: '', topic: '' });
-    const [showPrompts, setShowPrompts] = useState(false);
+    // 主界面表单、提示词、历史记录等状态
+    const [subject, setSubject]           = useState('');
+    const [topic, setTopic]               = useState('');
+    const [errors, setErrors]             = useState({ subject: '', topic: '' });
+    const [showPrompts, setShowPrompts]   = useState(false);
     const [visiblePrompts, setVisiblePrompts] = useState([]);
-
     const initialHistory = [
         { id: 1, title: 'Coffee Shop',   avatars: ['https://via.placeholder.com/32','https://via.placeholder.com/32','https://via.placeholder.com/32'] },
         { id: 2, title: 'Project Name',  avatars: ['https://via.placeholder.com/32','https://via.placeholder.com/32'] },
@@ -22,6 +21,19 @@ export default function LandingPage() {
     ];
     const [history] = useState(initialHistory);
 
+    // 登录/注册弹窗状态
+    const [showLogin, setShowLogin]   = useState(false);
+    const [showSignup, setShowSignup] = useState(false);
+
+    // 登录/注册表单状态
+    const [loginEmail, setLoginEmail]     = useState('');
+    const [loginPass, setLoginPass]       = useState('');
+    const [loginError, setLoginError]     = useState('');
+    const [signupEmail, setSignupEmail]   = useState('');
+    const [signupPass, setSignupPass]     = useState('');
+    const [signupError, setSignupError]   = useState('');
+
+    // 提示词列表（10 条）
     const prompts = [
         '💡 Product Idea For An AI Writing Tool',
         '🧑‍🤝‍🧑 Define Our Product\'s User Group',
@@ -35,6 +47,7 @@ export default function LandingPage() {
         '🗣️ Customer Feedback Survey Questions'
     ];
 
+    // 卡片样式配置
     const cardStyles = [
         { bg: 'rgba(50,50,58,0.8)',   initial: 'rotate(-15deg) translate(-240px,-30px)', z: 4 },
         { bg: 'rgba(200,180,120,0.8)', initial: 'rotate(-5deg)  translate(-80px,-20px)',  z: 3 },
@@ -42,7 +55,7 @@ export default function LandingPage() {
         { bg: 'rgba(80,100,150,0.8)',  initial: 'rotate(15deg)  translate(240px,-30px)', z: 1 },
     ];
 
-    // refs for prompt click outside
+    // refs 用于点击外部隐藏提示词
     const promptRef   = useRef(null);
     const textAreaRef = useRef(null);
 
@@ -61,14 +74,13 @@ export default function LandingPage() {
         return () => document.removeEventListener('mousedown', onClickOutside);
     }, []);
 
-    const validateField = (name, val) => {
-        if (!val.trim()) {
-            return name === 'subject'
+    // 表单校验
+    const validateField = (name, value) =>
+        !value.trim()
+            ? name === 'subject'
                 ? 'Please enter a subject.'
-                : 'Please describe what you want to brainstorm.';
-        }
-        return '';
-    };
+                : 'Please describe what you want to brainstorm.'
+            : '';
 
     const handleBlur = e => {
         const { name, value } = e.target;
@@ -76,13 +88,13 @@ export default function LandingPage() {
     };
 
     const handleStart = () => {
-        const e1 = validateField('subject', subject);
-        const e2 = validateField('topic', topic);
-        if (e1 || e2) {
-            setErrors({ subject: e1, topic: e2 });
+        const errSub = validateField('subject', subject);
+        const errTop = validateField('topic', topic);
+        if (errSub || errTop) {
+            setErrors({ subject: errSub, topic: errTop });
             return;
         }
-        console.log('Start:', subject, topic);
+        navigate('/select-roles', { state: { subject, topic } })
     };
 
     const handlePromptClick = p => {
@@ -92,25 +104,18 @@ export default function LandingPage() {
     };
 
     const handleTopicFocus = () => {
-        const s = [...prompts].sort(() => Math.random() - 0.5).slice(0, 4);
-        setVisiblePrompts(s);
+        const shuffled = [...prompts].sort(() => Math.random() - 0.5);
+        setVisiblePrompts(shuffled.slice(0, 4));
         setShowPrompts(true);
     };
 
-    // 登录/注册表单状态
-    const [loginEmail, setLoginEmail]       = useState('');
-    const [loginPass,  setLoginPass]        = useState('');
-    const [signupEmail, setSignupEmail]     = useState('');
-    const [signupPass,  setSignupPass]      = useState('');
-    const [loginError, setLoginError]       = useState('');
-    const [signupError,setSignupError]      = useState('');
-
+    // 登录/注册逻辑
     const handleLogin = () => {
         if (!loginEmail.trim() || !loginPass.trim()) {
             setLoginError('Email and password are required.');
             return;
         }
-        console.log('登录：', loginEmail, loginPass);
+        console.log('Logging in:', loginEmail);
         setShowLogin(false);
     };
 
@@ -119,7 +124,7 @@ export default function LandingPage() {
             setSignupError('Email and password are required.');
             return;
         }
-        console.log('注册：', signupEmail, signupPass);
+        console.log('Signing up:', signupEmail);
         setShowSignup(false);
     };
 
@@ -127,7 +132,8 @@ export default function LandingPage() {
         <Container>
             <Nav>
                 <Logo>
-                    <img src="/logo.png" alt="logo" /> <span>Aldealogue</span>
+                    <img src="/logo.png" alt="logo" />
+                    <span>Aldealogue</span>
                 </Logo>
                 <NavButtons>
                     <NavButton onClick={()=>setShowLogin(true)}>Log In</NavButton>
@@ -136,8 +142,12 @@ export default function LandingPage() {
             </Nav>
 
             <Main>
-                <Title>Start Your <GradientText>BrainStorming</GradientText> With AI</Title>
-                <Subtitle>Let <BlueText>Aldealogue</BlueText> Take Your Ideas Further</Subtitle>
+                <Title>
+                    Start Your <GradientText>BrainStorming</GradientText> With AI
+                </Title>
+                <Subtitle>
+                    Let <BlueText>Aldealogue</BlueText> Take Your Ideas Further
+                </Subtitle>
 
                 <FormWrapper>
                     <Form>
@@ -159,13 +169,18 @@ export default function LandingPage() {
                             onFocus={handleTopicFocus}
                             onBlur={handleBlur}
                         />
-                        <StartButton disabled={!subject.trim()||!topic.trim()} onClick={handleStart}>
+                        <StartButton
+                            disabled={!subject.trim()||!topic.trim()}
+                            onClick={handleStart}
+                        >
                             💡 Start
                         </StartButton>
                     </Form>
 
                     <PromptBox ref={promptRef} show={showPrompts}>
-                        <PromptTitle>Not Sure How To Start? Try These Brainstorming Prompts:</PromptTitle>
+                        <PromptTitle>
+                            Not Sure How To Start? Try These Brainstorming Prompts:
+                        </PromptTitle>
                         <PromptList>
                             {visiblePrompts.map((p,i)=>(
                                 <PromptItem key={i} onMouseDown={()=>handlePromptClick(p)}>
@@ -179,24 +194,30 @@ export default function LandingPage() {
                 {!showPrompts && (
                     <HistoryContainer>
                         {history.map((it,idx)=>{
-                            const {bg,initial,z} = cardStyles[idx];
+                            const { bg, initial, z } = cardStyles[idx];
                             return (
                                 <Card key={it.id} bg={bg} initial={initial} z={z}>
                                     <CardTitle>{it.title}</CardTitle>
                                     <AvatarContainer>
-                                        {it.avatars.slice(0,3).map((u,j)=>
+                                        {it.avatars.slice(0,3).map((u,j)=>(
                                             <Avatar key={j} src={u}/>
-                                        )}
+                                        ))}
                                         {it.avatars.length>3 && <MoreCount>+{it.avatars.length-3}</MoreCount>}
                                     </AvatarContainer>
                                 </Card>
                             );
                         })}
+                        {/* View More 链接，history ≥4 时显示 */}
+                        {history.length >= 4 && (
+                            <ViewMore onClick={()=>navigate('/panel')}>
+                                View More →
+                            </ViewMore>
+                        )}
                     </HistoryContainer>
                 )}
             </Main>
 
-            {/* Login Modal */}
+            {/* Log In 弹窗 */}
             {showLogin && (
                 <ModalOverlay>
                     <ModalContent>
@@ -222,7 +243,7 @@ export default function LandingPage() {
                 </ModalOverlay>
             )}
 
-            {/* Signup Modal */}
+            {/* Sign Up 弹窗 */}
             {showSignup && (
                 <ModalOverlay>
                     <ModalContent>
@@ -251,32 +272,33 @@ export default function LandingPage() {
     );
 }
 
+
 // ============ Styled Components ============
 
 const Container = styled.div`
   position: fixed; top:0; left:0; right:0; bottom:0;
-  display:flex; flex-direction:column;
   background: radial-gradient(circle at 50% 40%, rgba(20,25,50,1) 0%, rgba(10,15,30,1) 100%);
+  display: flex; flex-direction: column;
   overflow-x: visible; overflow-y: hidden;
 `;
 
 const Nav = styled.nav`
-  padding: 24px 40px; display:flex; justify-content:space-between; align-items:center;
+  padding:24px 40px; display:flex; justify-content:space-between; align-items:center;
 `;
 const Logo = styled.div`
   display:flex; align-items:center;
-  img{width:40px;margin-right:12px;}
+  img{width:40px; margin-right:12px;}
   span{
-    font-size:24px;font-weight:bold;
+    font-size:24px; font-weight:bold;
     background:linear-gradient(135deg,#4DAFFF,#63A8FF);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   }
 `;
-const NavButtons = styled.div`display:flex;gap:16px;`;
+const NavButtons = styled.div`display:flex; gap:16px;`;
 const NavButton = styled.button`
-  padding:8px 16px;border-radius:16px;font-size:14px;cursor:pointer;
+  padding:8px 16px; border-radius:16px; font-size:14px; cursor:pointer;
   background:${p=>p.dark?'#1E1E2E':'#FFF'};
-  color:${p=>p.dark?'#FFF':'#000'};border:1px solid ${p=>p.dark?'transparent':'#CCC'};
+  color:${p=>p.dark?'#FFF':'#000'}; border:1px solid ${p=>p.dark?'transparent':'#CCC'};
 `;
 
 const Main = styled.main`
@@ -289,17 +311,16 @@ const Title = styled.h1`
 `;
 const GradientText = styled.span`
   background:linear-gradient(135deg,#8C6FF0,#FF72CB);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 `;
 const Subtitle = styled.h2`
   position:relative; z-index:2;
-  margin:0 0 24px;
-  font-size:20px; color:#CCC;
+  margin:0 0 24px; font-size:20px; color:#CCC;
 `;
 const BlueText = styled.span`
   font-weight:bold;
   background:linear-gradient(135deg,#4DAFFF,#63A8FF);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 `;
 
 const FormWrapper = styled.div`
@@ -322,9 +343,9 @@ const TextArea = styled.textarea`
   &::placeholder{color:${p=>p.hasError?'#FF4D4F':'rgba(255,255,255,0.6)'};}
 `;
 const StartButton = styled.button`
-  padding:12px 32px;border-radius:32px;font-size:18px;cursor:pointer;
+  padding:12px 32px; border-radius:32px; font-size:18px; cursor:pointer;
   background:linear-gradient(135deg,#8C6FF0,#FF72CB);
-  color:rgba(255,255,255,0.8);border:none;
+  color:rgba(255,255,255,0.8); border:none;
   opacity:${p=>p.disabled?0.5:1};
 `;
 
@@ -333,15 +354,17 @@ const PromptBox = styled.div`
   transform:translate(-50%,16px);
   width:600px; max-width:90%; padding:24px;
   background:rgba(10,10,20,0.85); border-radius:16px;
-  border:1px solid rgba(255,114,203,0.6);
-  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  border:1px solid rgba(255,114,203,0.6); box-shadow:0 8px 24px rgba(0,0,0,0.4);
   z-index:2;
-  opacity:${p=>p.show?1:0};
-  pointer-events:${p=>p.show?'auto':'none'};
+  opacity:${p=>p.show?1:0}; pointer-events:${p=>p.show?'auto':'none'};
   transition:opacity .3s ease;
 `;
-const PromptTitle = styled.div`color:#FFF; font-size:16px; margin-bottom:16px;`;
-const PromptList = styled.div`display:grid; grid-template-columns:1fr 1fr; gap:16px;`;
+const PromptTitle = styled.div`
+  color:#FFF; font-size:16px; margin-bottom:16px;
+`;
+const PromptList = styled.div`
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+`;
 const PromptItem = styled.div`
   padding:12px 16px; border-radius:32px;
   background:linear-gradient(135deg,#8C6FF0,#FF72CB);
@@ -354,6 +377,11 @@ const HistoryContainer = styled.div`
   margin-top:60px; position:relative; width:100%; height:180px;
   overflow:visible; display:flex; justify-content:center; align-items:flex-start;
 `;
+const ViewMore = styled.div`
+  position:absolute; right:24px; bottom:0;
+  font-size:14px; color:#63A8FF; cursor:pointer;
+  &:hover{text-decoration:underline;}
+`;
 const AvatarContainer = styled.div`
   display:flex; align-items:center;
   opacity:0; transform:translateY(10px);
@@ -363,7 +391,9 @@ const Avatar = styled.img`
   width:32px; height:32px; border-radius:50%;
   margin-right:-8px; border:2px solid #0f0f1f;
 `;
-const MoreCount = styled.div`margin-left:8px; font-size:14px; color:#FFF;`;
+const MoreCount = styled.div`
+  margin-left:8px; font-size:14px; color:#FFF;
+`;
 const Card = styled.div`
   position:absolute; width:180px; height:260px; padding:16px; border-radius:16px;
   backdrop-filter:blur(10px); box-shadow:0 8px 24px rgba(0,0,0,0.2);
@@ -376,13 +406,15 @@ const Card = styled.div`
     ${AvatarContainer}{opacity:1; transform:translateY(0);}
   }
 `;
-const CardTitle = styled.div`font-size:18px; font-weight:bold; color:#FFF;`;
+const CardTitle = styled.div`
+  font-size:18px; font-weight:bold; color:#FFF;
+`;
 
-// ---- Modal common ----
+// Modal 共用样式
 const ModalOverlay = styled.div`
   position:fixed; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center;
-  z-index:10;
+  background:rgba(0,0,0,0.5); display:flex;
+  justify-content:center; align-items:center; z-index:10;
 `;
 const ModalContent = styled.div`
   background:rgba(20,20,30,0.95); padding:24px; border-radius:16px;
@@ -392,7 +424,7 @@ const ModalTitle = styled.h3`
   margin:0 0 16px; font-size:20px; color:#FFF; text-align:center;
 `;
 const ModalInput = styled.input`
-  width:90%; padding:12px 16px; margin-bottom:12px;margin: 0 auto 12px; border-radius:8px;
+  width:66%; margin:0 auto 12px; padding:12px 16px; border-radius:8px;
   border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1);
   color:#FFF; font-size:14px; outline:none;
   &::placeholder{color:rgba(255,255,255,0.6);}
