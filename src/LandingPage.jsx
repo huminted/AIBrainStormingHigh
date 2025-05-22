@@ -316,7 +316,7 @@ const GradientText = styled.span`
 `;
 const Subtitle = styled.h2`
   position:relative; z-index:2;
-  margin:0 0 24px; font-size:20px; color:#CCC;
+  margin:0 0 44px; font-size:20px; color:#CCC;
 `;
 const BlueText = styled.span`
   font-weight:bold;
