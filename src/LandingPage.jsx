@@ -133,7 +133,7 @@ export default function LandingPage() {
         <Container>
             <Nav>
                 <Logo>
-                    <img src='./assets/logo.png' />
+                    <img src={logo} alt="Logo" />
                     <span>Aldealogue</span>
                 </Logo>
                 <NavButtons>
@@ -288,7 +288,7 @@ const Nav = styled.nav`
 `;
 const Logo = styled.div`
   display:flex; align-items:center;
-  img{width:40px; margin-right:12px;}
+  img{width:80px; height: auto;margin-right:12px;}
   span{
     font-size:24px; font-weight:bold;
     background:linear-gradient(135deg,#4DAFFF,#63A8FF);

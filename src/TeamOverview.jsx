@@ -59,7 +59,7 @@ export default function TeamOverview() {
                     </Card>
                 ))}
             </GridContainer>
-            <NextBtn onClick={() => alert("Let's Start!")}>Let's Start</NextBtn>
+            <NextBtn onClick={() => {window.location.href = 'http://43.157.65.157:5222/#';}}>Let's Start</NextBtn>
         </Page>
     )
 }
